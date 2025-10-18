@@ -1,0 +1,21 @@
+# ------------------
+# OS / Editor
+# ------------------
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# ------------------
+# Go
+# ------------------
+/backend/bin/
+/backend/*.exe
+/backend/*.test
+/backend/vendor/
+/backend/*.out
+/backend/.env
