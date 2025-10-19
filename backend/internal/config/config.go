@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -49,10 +50,17 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
-func getEnv(key, defaultValue string) string {
+func getEnv(key, fallback string) string {
 	if val := os.Getenv(key); val != "" {
 		return val
 	}
 
-	return defaultValue
+	return fallback
+}
+
+func (c *Config) DSN() string {
+	return fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Europe/Moscow",
+		c.DB.Host, c.DB.User, c.DB.Password, c.DB.Name, c.DB.Port, c.DB.SSLMode,
+	)
 }
