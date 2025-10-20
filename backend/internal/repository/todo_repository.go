@@ -35,7 +35,7 @@ func (r *todoRepository) GetAll(ctx context.Context) ([]entity.Todo, error) {
 
 func (r *todoRepository) GetByID(ctx context.Context, id uint) (*entity.Todo, error) {
 	var todo entity.Todo
-	err := r.db.WithContext(ctx).First(&todo).Error
+	err := r.db.WithContext(ctx).Where("id = ?", id).First(&todo).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, entity.ErrTodoNotFound
@@ -57,7 +57,7 @@ func (r *todoRepository) Update(ctx context.Context, todo *entity.Todo) error {
 }
 
 func (r *todoRepository) Delete(ctx context.Context, id uint) error {
-	result := r.db.WithContext(ctx).Delete(&entity.Todo{}, id)
+	result := r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Todo{}, id)
 	if result.Error != nil {
 		return entity.ErrTodoDatabase
 	}
