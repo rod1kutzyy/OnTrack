@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 
 	"github.com/rod1kutzyy/OnTrack/internal/entity"
 )
@@ -27,9 +26,8 @@ func NewTodoUsecase(repo TodoRepository) *TodoUsecase {
 
 func (uc *TodoUsecase) Create(ctx context.Context, todo *entity.Todo) error {
 	if todo.Title == "" {
-		return errors.New("title is required")
+		return entity.ErrTodoTitleRequired
 	}
-
 	return uc.repo.Create(ctx, todo)
 }
 
@@ -42,6 +40,9 @@ func (uc *TodoUsecase) GetByID(ctx context.Context, id uint) (*entity.Todo, erro
 }
 
 func (uc *TodoUsecase) Update(ctx context.Context, todo *entity.Todo) error {
+	if todo.Title == "" {
+		return entity.ErrTodoTitleRequired
+	}
 	return uc.repo.Update(ctx, todo)
 }
 

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -11,6 +12,10 @@ import (
 	"github.com/rod1kutzyy/OnTrack/internal/usecase"
 )
 
+type ErrorResponse struct {
+	Message string `json:"message"`
+}
+
 type TodoHandler struct {
 	usecase *usecase.TodoUsecase
 }
@@ -19,11 +24,26 @@ func NewTodoHandler(uc *usecase.TodoUsecase) *TodoHandler {
 	return &TodoHandler{usecase: uc}
 }
 
+func mapErrorToResponse(err error) (int, ErrorResponse) {
+	switch {
+	case errors.Is(err, entity.ErrTodoNotFound):
+		return http.StatusNotFound, ErrorResponse{Message: entity.ErrTodoNotFound.Error()}
+	case errors.Is(err, entity.ErrTodoTitleRequired):
+		return http.StatusBadRequest, ErrorResponse{Message: entity.ErrTodoTitleRequired.Error()}
+	case errors.Is(err, entity.ErrInvalidTodo):
+		return http.StatusBadRequest, ErrorResponse{Message: entity.ErrInvalidTodo.Error()}
+	case errors.Is(err, entity.ErrTodoDatabase):
+		return http.StatusInternalServerError, ErrorResponse{Message: entity.ErrTodoDatabase.Error()}
+	default:
+		return http.StatusInternalServerError, ErrorResponse{Message: "internal server error"}
+	}
+}
+
 func (h *TodoHandler) Create(c *gin.Context) {
 	var todo entity.Todo
 	if err := c.ShouldBindJSON(&todo); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid request body",
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Message: "invalid request body",
 		})
 		return
 	}
@@ -32,9 +52,8 @@ func (h *TodoHandler) Create(c *gin.Context) {
 	defer cancel()
 
 	if err := h.usecase.Create(ctx, &todo); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to create todo",
-		})
+		code, response := mapErrorToResponse(err)
+		c.JSON(code, response)
 		return
 	}
 
@@ -47,9 +66,8 @@ func (h *TodoHandler) GetAll(c *gin.Context) {
 
 	todos, err := h.usecase.GetAll(ctx)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to fetch todos",
-		})
+		code, response := mapErrorToResponse(err)
+		c.JSON(code, response)
 		return
 	}
 
@@ -60,7 +78,7 @@ func (h *TodoHandler) GetByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil || id <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid ID",
+			"error": "invalid todo ID",
 		})
 		return
 	}
@@ -70,9 +88,8 @@ func (h *TodoHandler) GetByID(c *gin.Context) {
 
 	todo, err := h.usecase.GetByID(ctx, uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "todo not found",
-		})
+		code, response := mapErrorToResponse(err)
+		c.JSON(code, response)
 		return
 	}
 
@@ -83,7 +100,7 @@ func (h *TodoHandler) Update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil || id <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid ID",
+			"error": "invalid todo ID",
 		})
 		return
 	}
@@ -102,9 +119,8 @@ func (h *TodoHandler) Update(c *gin.Context) {
 	defer cancel()
 
 	if err := h.usecase.Update(ctx, &todo); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to update todo",
-		})
+		code, response := mapErrorToResponse(err)
+		c.JSON(code, response)
 		return
 	}
 
@@ -115,7 +131,7 @@ func (h *TodoHandler) Delete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil || id <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid ID",
+			"error": "invalid todo ID",
 		})
 		return
 	}
@@ -124,9 +140,8 @@ func (h *TodoHandler) Delete(c *gin.Context) {
 	defer cancel()
 
 	if err := h.usecase.Delete(ctx, uint(id)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to delete todo",
-		})
+		code, response := mapErrorToResponse(err)
+		c.JSON(code, response)
 		return
 	}
 
