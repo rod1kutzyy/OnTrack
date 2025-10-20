@@ -1,6 +1,16 @@
 package entity
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var (
+	ErrTodoNotFound      = errors.New("todo not found")
+	ErrInvalidTodo       = errors.New("invalid todo data")
+	ErrTodoTitleRequired = errors.New("todo's title is required")
+	ErrTodoDatabase      = errors.New("todo database error")
+)
 
 type Todo struct {
 	ID          uint      `gorm:"primaryKey;autoIncrement" json:"id"`
