@@ -1,7 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/rod1kutzyy/OnTrack/internal/config"
 	"github.com/rod1kutzyy/OnTrack/internal/delivery/http"
@@ -42,7 +47,22 @@ func main() {
 	todoHandler := handlers.NewTodoHandler(todoUseCase)
 	server := http.NewServer(cfg.App.Port, todoHandler)
 
-	if err := server.Run(); err != nil {
-		log.Fatalf("error starting server: %v", err)
+	go func() {
+		if err := server.Run(); err != nil {
+			log.Fatalf("error starting server: %v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	<-quit
+	log.Println("Shutting down server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("error shutting down server: %v", err)
 	}
 }
