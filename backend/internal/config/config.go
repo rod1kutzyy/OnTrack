@@ -3,16 +3,24 @@ package config
 import (
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/joho/godotenv"
 )
 
-type AppConfig struct {
-	Env  string
-	Port string
+type Config struct {
+	Server   ServerConfig
+	Database DatabaseConfig
+	App      AppConfig
 }
 
-type DBConfig struct {
+type ServerConfig struct {
+	Host string
+	Port string
+	Mode string
+}
+
+type DatabaseConfig struct {
 	Host     string
 	Port     string
 	User     string
@@ -21,46 +29,68 @@ type DBConfig struct {
 	SSLMode  string
 }
 
-type Config struct {
-	App AppConfig
-	DB  DBConfig
+type AppConfig struct {
+	LogLevel string
 }
+
+var (
+	config *Config
+	once   sync.Once
+)
 
 func Load() (*Config, error) {
-	_ = godotenv.Load()
+	var err error
 
-	appEnv := getEnv("APP_ENV", "development")
-	appPort := getEnv("APP_PORT", "8080")
+	once.Do(func() {
+		_ = godotenv.Load()
 
-	cfg := &Config{
-		App: AppConfig{
-			Env:  appEnv,
-			Port: appPort,
-		},
-		DB: DBConfig{
-			Host:     getEnv("DB_HOST", "localhost"),
-			Port:     getEnv("DB_PORT", "5432"),
-			User:     getEnv("DB_USER", "postgres"),
-			Password: getEnv("DB_PASS", "postgres"),
-			Name:     getEnv("DB_NAME", "todo-list"),
-			SSLMode:  getEnv("DB_SSLMODE", "disable"),
-		},
-	}
+		config = &Config{
+			Server: ServerConfig{
+				Host: getEnv("SERVER_HOST", "localhost"),
+				Port: getEnv("SERVER_PORT", "8080"),
+				Mode: getEnv("GIN_MODE", "debug"),
+			},
+			Database: DatabaseConfig{
+				Host:     getEnv("DB_HOST", "localhost"),
+				Port:     getEnv("DB_PORT", "5432"),
+				User:     getEnv("DB_USER", "postgres"),
+				Password: getEnv("DB_PASSWORD", "postgres"),
+				Name:     getEnv("DB_NAME", "ontrack_db"),
+				SSLMode:  getEnv("DB_SSLMODE", "disable"),
+			},
+			App: AppConfig{
+				getEnv("LOG_LEVEL", "info"),
+			},
+		}
 
-	return cfg, nil
+		if config.Database.User == "" || config.Database.Name == "" {
+			err = fmt.Errorf("database user and name are required")
+		}
+	})
+
+	return config, err
 }
 
-func getEnv(key, fallback string) string {
+func (c *Config) GetDSN() string {
+	return fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		c.Database.Host,
+		c.Database.Port,
+		c.Database.User,
+		c.Database.Password,
+		c.Database.Name,
+		c.Database.SSLMode,
+	)
+}
+
+func (c *Config) GetServerAddress() string {
+	return fmt.Sprintf("%s:%s", c.Server.Host, c.Server.Port)
+}
+
+func getEnv(key, defaultValue string) string {
 	if val := os.Getenv(key); val != "" {
 		return val
 	}
 
-	return fallback
-}
-
-func (c *Config) DSN() string {
-	return fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Europe/Moscow",
-		c.DB.Host, c.DB.User, c.DB.Password, c.DB.Name, c.DB.Port, c.DB.SSLMode,
-	)
+	return defaultValue
 }
