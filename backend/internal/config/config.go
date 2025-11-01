@@ -11,13 +11,12 @@ import (
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
-	App      AppConfig
+	Logger   LoggerConfig
 }
 
 type ServerConfig struct {
 	Host string
 	Port string
-	Mode string
 }
 
 type DatabaseConfig struct {
@@ -29,8 +28,8 @@ type DatabaseConfig struct {
 	SSLMode  string
 }
 
-type AppConfig struct {
-	LogLevel string
+type LoggerConfig struct {
+	Level string
 }
 
 var (
@@ -42,24 +41,23 @@ func Load() (*Config, error) {
 	var err error
 
 	once.Do(func() {
-		_ = godotenv.Load()
+		err = godotenv.Load()
 
 		config = &Config{
 			Server: ServerConfig{
 				Host: getEnv("SERVER_HOST", "localhost"),
 				Port: getEnv("SERVER_PORT", "8080"),
-				Mode: getEnv("GIN_MODE", "debug"),
 			},
 			Database: DatabaseConfig{
 				Host:     getEnv("DB_HOST", "localhost"),
 				Port:     getEnv("DB_PORT", "5432"),
 				User:     getEnv("DB_USER", "postgres"),
-				Password: getEnv("DB_PASSWORD", "postgres"),
+				Password: getEnv("DB_PASSWORD", ""),
 				Name:     getEnv("DB_NAME", "ontrack_db"),
 				SSLMode:  getEnv("DB_SSLMODE", "disable"),
 			},
-			App: AppConfig{
-				getEnv("LOG_LEVEL", "info"),
+			Logger: LoggerConfig{
+				Level: getEnv("LOG_LEVEL", "info"),
 			},
 		}
 
@@ -71,20 +69,11 @@ func Load() (*Config, error) {
 	return config, err
 }
 
-func (c *Config) GetDSN() string {
+func (c *DatabaseConfig) GetDSN() string {
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		c.Database.Host,
-		c.Database.Port,
-		c.Database.User,
-		c.Database.Password,
-		c.Database.Name,
-		c.Database.SSLMode,
+		c.Host, c.Port, c.User, c.Password, c.Name, c.SSLMode,
 	)
-}
-
-func (c *Config) GetServerAddress() string {
-	return fmt.Sprintf("%s:%s", c.Server.Host, c.Server.Port)
 }
 
 func getEnv(key, defaultValue string) string {
