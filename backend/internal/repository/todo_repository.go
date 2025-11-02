@@ -12,5 +12,5 @@ type TodoRepository interface {
 	GetAll(ctx context.Context, filter domain.TodoFilter) ([]domain.Todo, error)
 	Update(ctx context.Context, todo *domain.Todo) error
 	Delete(ctx context.Context, id uint) error
-	Count(ctx context.Context, filter domain.TodoFilter)
+	Count(ctx context.Context, filter domain.TodoFilter) (int64, error)
 }
