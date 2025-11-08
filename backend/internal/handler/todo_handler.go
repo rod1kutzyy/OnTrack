@@ -27,6 +27,16 @@ func NewTodoHandler(todoUseCase usecase.TodoUseCase, validator *validator.TodoVa
 	}
 }
 
+// @Summary Create a new Todo
+// @Description Creates a new todo item and stores it in the database
+// @Tags todos
+// @Accept json
+// @Produce json
+// @Param input body dto.CreateTodoRequest true "Todo creation data"
+// @Success 201 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /todos [post]
 func (h *TodoHandler) CreateTodo(c *gin.Context) {
 	var req dto.CreateTodoRequest
 
@@ -61,6 +71,16 @@ func (h *TodoHandler) CreateTodo(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// @Summary Get Todo by ID
+// @Description Returns a single todo item by its ID
+// @Tags todos
+// @Produce json
+// @Param id path int true "Todo ID"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /todos/{id} [get]
 func (h *TodoHandler) GetTodoByID(c *gin.Context) {
 	id, err := h.parseIDParam(c)
 	if err != nil {
@@ -95,6 +115,18 @@ func (h *TodoHandler) GetTodoByID(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// @Summary Get all Todos
+// @Description Returns a paginated list of todos, optionally filtered by completion status or search term
+// @Tags todos
+// @Produce json
+// @Param completed query bool false "Filter by completion status"
+// @Param search query string false "Search keyword"
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /todos [get]
 func (h *TodoHandler) GetAllTodos(c *gin.Context) {
 	var filter dto.TodoFilterRequest
 
@@ -143,6 +175,18 @@ func (h *TodoHandler) GetAllTodos(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// @Summary Update Todo
+// @Description Updates an existing todo item by its ID
+// @Tags todos
+// @Accept json
+// @Produce json
+// @Param id path int true "Todo ID"
+// @Param input body dto.UpdateTodoRequest true "Updated todo data"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /todos/{id} [put]
 func (h *TodoHandler) UpdateTodo(c *gin.Context) {
 	id, err := h.parseIDParam(c)
 	if err != nil {
@@ -197,6 +241,16 @@ func (h *TodoHandler) UpdateTodo(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// @Summary Delete Todo
+// @Description Deletes a todo item by its ID
+// @Tags todos
+// @Produce json
+// @Param id path int true "Todo ID"
+// @Success 204 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /todos/{id} [delete]
 func (h *TodoHandler) DeleteTodo(c *gin.Context) {
 	id, err := h.parseIDParam(c)
 	if err != nil {
@@ -230,6 +284,16 @@ func (h *TodoHandler) DeleteTodo(c *gin.Context) {
 	c.JSON(http.StatusNoContent, response)
 }
 
+// @Summary Toggle Todo completion
+// @Description Toggles the completion status (done/undone) of a todo item by its ID
+// @Tags todos
+// @Produce json
+// @Param id path int true "Todo ID"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /todos/{id}/toggle [patch]
 func (h *TodoHandler) ToggleTodoComplete(c *gin.Context) {
 	id, err := h.parseIDParam(c)
 	if err != nil {

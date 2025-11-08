@@ -8,6 +8,8 @@ import (
 	"github.com/rod1kutzyy/OnTrack/internal/config"
 	"github.com/rod1kutzyy/OnTrack/internal/handler"
 	"github.com/rod1kutzyy/OnTrack/internal/middleware"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func SetupRouter(cfg *config.Config, todoHandler *handler.TodoHandler) *gin.Engine {
@@ -67,6 +69,8 @@ func SetupRouter(cfg *config.Config, todoHandler *handler.TodoHandler) *gin.Engi
 			"path":    c.Request.URL.Path,
 		})
 	})
+
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }
