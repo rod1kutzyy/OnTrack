@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	_ "github.com/rod1kutzyy/OnTrack/docs"
 	"github.com/rod1kutzyy/OnTrack/internal/config"
 	"github.com/rod1kutzyy/OnTrack/internal/domain"
 	"github.com/rod1kutzyy/OnTrack/internal/handler"
@@ -14,6 +15,13 @@ import (
 	"github.com/rod1kutzyy/OnTrack/internal/validator"
 )
 
+// @title OnTrack API
+// @version 1.0
+// @description The REST API of the OnTrack service is an application for managing tasks.
+// @termsOfService http://swagger.io/terms/
+
+// @host localhost:8080
+// @BasePath /api/v1
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
