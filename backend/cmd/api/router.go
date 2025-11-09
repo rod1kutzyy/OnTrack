@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rod1kutzyy/OnTrack/internal/config"
 	"github.com/rod1kutzyy/OnTrack/internal/handler"
@@ -23,6 +24,14 @@ func SetupRouter(cfg *config.Config, todoHandler *handler.TodoHandler) *gin.Engi
 
 	router.Use(middleware.Recovery())
 	router.Use(middleware.Logger())
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:  cfg.Server.FrontedURLs,
+		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
+		AllowHeaders:  []string{"Origin", "Content-Type"},
+		ExposeHeaders: []string{"Content-Length"},
+		MaxAge:        12 * time.Hour,
+	}))
 
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

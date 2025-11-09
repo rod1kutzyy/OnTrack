@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/joho/godotenv"
@@ -15,8 +16,9 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Host string
-	Port string
+	Host        string
+	Port        string
+	FrontedURLs []string
 }
 
 type DatabaseConfig struct {
@@ -45,8 +47,9 @@ func Load() (*Config, error) {
 
 		config = &Config{
 			Server: ServerConfig{
-				Host: getEnv("SERVER_HOST", "localhost"),
-				Port: getEnv("SERVER_PORT", "8080"),
+				Host:        getEnv("SERVER_HOST", "localhost"),
+				Port:        getEnv("SERVER_PORT", "8080"),
+				FrontedURLs: strings.Split(getEnv("FRONTEND_URLS", "http://localhost:5173,http://127.0.0.1:5173"), ","),
 			},
 			Database: DatabaseConfig{
 				Host:     getEnv("DB_HOST", "localhost"),

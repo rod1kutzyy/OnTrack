@@ -280,8 +280,7 @@ func (h *TodoHandler) DeleteTodo(c *gin.Context) {
 		return
 	}
 
-	response := dto.NewSuccessResponse(nil, "Todo deleted successfully")
-	c.JSON(http.StatusNoContent, response)
+	c.Status(http.StatusNoContent)
 }
 
 // @Summary Toggle Todo completion
