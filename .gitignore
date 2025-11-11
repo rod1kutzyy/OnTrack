@@ -1,6 +1,4 @@
-# ------------------
 # OS / Editor
-# ------------------
 .DS_Store
 Thumbs.db
 *.log
@@ -10,12 +8,11 @@ Thumbs.db
 *.sublime-workspace
 *.sublime-project
 
-# ------------------
 # Go
-# ------------------
 /backend/bin/
+/backend/*.bin
 /backend/*.exe
 /backend/*.test
 /backend/vendor/
 /backend/*.out
-/backend/.env
+*.env

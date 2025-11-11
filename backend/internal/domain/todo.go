@@ -24,7 +24,7 @@ type TodoFilter struct {
 
 func (f *TodoFilter) Validate() {
 	if f.Limit <= 0 {
-		f.Limit = 10
+		f.Limit = 5
 	}
 
 	if f.Limit > 100 {
