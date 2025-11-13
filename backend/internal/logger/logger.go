@@ -31,12 +31,3 @@ func Init(level string) error {
 
 	return nil
 }
-
-func GetLogger() *logrus.Logger {
-	if Logger == nil {
-		Logger = logrus.New()
-		Logger.SetLevel(logrus.InfoLevel)
-	}
-
-	return Logger
-}

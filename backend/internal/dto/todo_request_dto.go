@@ -39,11 +39,3 @@ func (f *TodoFilterRequest) Validate() {
 		f.Limit = 100
 	}
 }
-
-func (f *TodoFilterRequest) HasSearchField() bool {
-	return f.Search != ""
-}
-
-func (f *TodoFilterRequest) HasCompletedField() bool {
-	return f.Completed != nil
-}

@@ -35,18 +35,3 @@ func (f *TodoFilter) Validate() {
 		f.Offset = 0
 	}
 }
-
-func (f *TodoFilter) IsZero() bool {
-	return f.Completed == nil &&
-		f.Search == "" &&
-		f.Limit == 0 &&
-		f.Offset == 0
-}
-
-func (f *TodoFilter) HasSearchField() bool {
-	return f.Search != ""
-}
-
-func (f *TodoFilter) HasCompletedField() bool {
-	return f.Completed != nil
-}
