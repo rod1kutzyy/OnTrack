@@ -102,6 +102,7 @@ func (h *TodoHandler) GetTodoByID(c *gin.Context) {
 				"TODO_NOT_FOUND",
 			)
 			c.JSON(http.StatusNotFound, response)
+			return
 		}
 
 		logger.Logger.WithError(err).Error("Failed to get todo")

@@ -21,13 +21,13 @@ func Init(level string) error {
 	logLevel, err := logrus.ParseLevel(level)
 	if err != nil {
 		Logger.SetLevel(logrus.InfoLevel)
-		Logger.Warnf("Invalid log level '%s', useing 'info' level", level)
+		Logger.Warnf("Invalid log level '%s', using 'info' level", level)
 	} else {
 		Logger.SetLevel(logLevel)
 	}
 	Logger.SetReportCaller(true)
 
-	Logger.Info("Logger initialized succesfully")
+	Logger.Info("Logger initialized successfully")
 
 	return nil
 }
