@@ -52,20 +52,16 @@ func Load() (*Config, error) {
 				FrontedURLs: strings.Split(getEnv("FRONTEND_URLS", "http://localhost:5173,http://127.0.0.1:5173"), ","),
 			},
 			Database: DatabaseConfig{
-				Host:     getEnv("DB_HOST", "localhost"),
+				Host:     getEnv("DB_HOST", "db"),
 				Port:     getEnv("DB_PORT", "5432"),
 				User:     getEnv("DB_USER", "postgres"),
-				Password: getEnv("DB_PASSWORD", ""),
-				Name:     getEnv("DB_NAME", "ontrack_db"),
+				Password: getEnv("DB_PASSWORD", "password"),
+				Name:     getEnv("DB_NAME", "ontrack"),
 				SSLMode:  getEnv("DB_SSLMODE", "disable"),
 			},
 			Logger: LoggerConfig{
 				Level: getEnv("LOG_LEVEL", "info"),
 			},
-		}
-
-		if config.Database.User == "" || config.Database.Name == "" {
-			err = fmt.Errorf("database user and name are required")
 		}
 	})
 
