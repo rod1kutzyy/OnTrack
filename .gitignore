@@ -15,4 +15,3 @@ Thumbs.db
 /backend/*.test
 /backend/vendor/
 /backend/*.out
-*.env

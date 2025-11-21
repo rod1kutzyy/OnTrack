@@ -47,7 +47,7 @@ func Load() (*Config, error) {
 
 		config = &Config{
 			Server: ServerConfig{
-				Host:        getEnv("SERVER_HOST", "localhost"),
+				Host:        getEnv("SERVER_HOST", "0.0.0.0"),
 				Port:        getEnv("SERVER_PORT", "8080"),
 				FrontedURLs: strings.Split(getEnv("FRONTEND_URLS", "http://localhost:5173,http://127.0.0.1:5173"), ","),
 			},
